@@ -1,9 +1,9 @@
-/* Importar los modulos requeridos */
+/* Importar los módulos requeridos */
 const express = require('express');
-const conexion = require('./database/conection');
-const controladorCentrales = require('./api/centrales/controller');
-const controladorUsuarios = require('./api/usuarios/controller')
-const bodyparser = require('body-parser');
+const conexion = require('./database/connection');
+const controladorProductos = require('./api/productos/controller');
+const controladorUsuarios = require('./api/usuarios/controller');
+const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -12,28 +12,25 @@ require('dotenv').config();
 
 /* Configuracion Inicial */
 const app = express();
-const port = process.env.PORT;
-app.use(bodyparser.json());
-app.use(bodyparser.urlencoded({extended: true}));
-app.use(morgan(process.env.MORGAN));
+const port = process.env.PORT || 3500;
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(morgan('combined'));
 app.use(cors());
 app.use(compression());
-
-
+app.use(helmet());
 
 /* Iniciar las rutas */
-app.use("/api/centrales", controladorCentrales);
-app.use("/api/usuarios", controladorUsuarios );
+app.use('/api/productos', controladorProductos);
+app.use('/api/usuarios', controladorUsuarios);
 
-/* Configurar el puerto  */
+/* Configurar el puerto */
 conexion.conectar()
-.then(function () {
-    app.listen(port, function () {
-        console.log("Api ejecutandose en el puerto: " + port );
-       /*  console.log(conexion.obtenerConexion()); */
-    }); 
-})
-.catch(function (error) {
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`API ejecutándose exitosamente en el puerto: ${port}`);
+    });
+  })
+  .catch((error) => {
     console.log(error);
-})
-
+  });

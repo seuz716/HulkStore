@@ -1,7 +1,7 @@
 {
   "name": "energia-app",
   "version": "1.0.0",
-  "description": "Api consulta generacion energetica",
+  "description": "ApiHulk",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,15 +11,15 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/seuz716/Energia.git"
+    "url": "https://github.com/seuz716/HulkStore"
   },
   "keywords": [
-    "Energía"
+    "Productos"
   ],
   "bugs": {
-    "url": "https://github.com/seuz716/Energia/issues"
+    "url": ""
   },
-  "homepage": "https://github.com/seuz716/Energia#readme",
+  "homepage": "",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.0",
