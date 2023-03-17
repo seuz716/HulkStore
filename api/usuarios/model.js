@@ -8,20 +8,31 @@ const objectId = require("mongodb").ObjectId;
 */
 
 
+/**
+ * Función para buscar todos los usuarios en la base de datos.
+ * Utiliza async/await para manejar la asincronía.
+ * @returns {Promise} Una promesa que resuelve con los usuarios encontrados en la base de datos.
+ *                    Si ocurre un error, la promesa se rechaza con un objeto de Error.
+ */
+async function findAll() {
+  // Obtiene la conexión a la base de datos desde el módulo de conexión.
+  let db = basedatos.obtenerConexion();
 
-    function findAll() {
-        let db =  basedatos.obtenerConexion();
-        return db.collection("users").find({}).toArray()
-        .then(function (usuarios){
-            return usuarios;
-        })
-        .catch(function (error) {
-            console.log(error)
-        });
+  try {
+    // Busca todos los usuarios en la colección "users".
+    let usuarios = await db.collection("users").find({}).toArray();
+    return usuarios;
+  } catch (error) {
+    // Si ocurre un error, lanza una excepción con un mensaje de error.
+    throw new Error("Error al buscar los usuarios: " + error.message);
+  } 
+}
 
-        };
 
-    function obtenerUna(id) {
+
+
+
+function obtenerUna(id) {
             let db =  basedatos.obtenerConexion();
              return db.collection("users").findOne({"_id" : objectId(id)})
             .then(function (usuario){
@@ -40,7 +51,7 @@ async function buscarUsuario(nombre) {
 
 async function crearUno(datosUsuario){
     let db =  basedatos.obtenerConexion();
-     return  await db.collection("usersPlants").insertOne(datosUsuario);
+     return  await db.collection("users").insertOne(datosUsuario);
 };
 
 function actualizarUna(id, datos){
@@ -83,3 +94,4 @@ function eliminarUna(id){
     module.exports.actualizarUna = actualizarUna;
     module.exports.eliminarUna = eliminarUna;
     module.exports.buscarUsuario = buscarUsuario;
+    

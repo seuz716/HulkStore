@@ -13,12 +13,19 @@ controladorUsuarios.get("/iniciarSesion", async function (req,res) {
   res.send(resultado);
 });
 
+
+controladorUsuarios.get("/obtenerusers", async function (req,res) {
+  let datosUsuario = req.query;
+  let resultado = await servicioUsuarios.obtenerUsuarios();
+  res.send(resultado);
+});
+
 /* 
 Endpoint para crear un nuevo usuario.
 Recibe datos de usuario por medio de body.
 Devuelve el resultado de la operación.
 */
-controladorUsuarios.post("/crearUsuario", async function (req, res) {
+controladorUsuarios.post("/crearusuario", async function (req, res) {
   let datosUsuario = req.body;
   let resultado = await servicioUsuarios.crearUsuario(datosUsuario);
   res.send(resultado);

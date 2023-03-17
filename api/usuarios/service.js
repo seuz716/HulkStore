@@ -41,36 +41,59 @@ async function obtenerUsuarios(){
     return resultado;
 };
 
-async function crearUsuario (datosUsuario){
-     let resultado = {};
-    /*1. objeto vacio*
-      *2  existan  las llaves usuario y  clave
-    */
-    if (datosUsuario  && Object.keys(datosUsuario).length>0){
-        if (datosUsuario.usuario && datosUsuario.clave){
-            let claveEncriptada = bcrypt.hashSync(datosUsuario.clave, parseInt(process.env.ENC_SALTROUNDS));
-            datosUsuario.clave = claveEncriptada;
-            let resultadoCrear = await modeloUsuarios.crearUno(datosUsuario);
-            if (resultadoCrear && resultadoCrear.acknowledged){
-                resultado.mensaje = "Usuario creado correctamente";
-                resultado.datos = resultadoCrear;
-                
-            } else {
-                resultado.mensaje = "Usuario  no creado";
-                resultado.datos = datosUsuario;
-            }
-        }
-         else {
-               resultado.mensaje = "Usuario y clave deben existir";
-               resultado.datos = datosUsuario;
-        }
+
+/**
+ * Función para crear un nuevo usuario en la base de datos.
+ * @param {Object} datosUsuario - Los datos del usuario a crear.
+ * @param {string} datosUsuario.usuario - El nombre de usuario del nuevo usuario.
+ * @param {string} datosUsuario.clave - La contraseña en texto plano del nuevo usuario.
+ * @returns {Object} Un objeto que indica si el usuario se creó correctamente o no.
+ */
+async function crearUsuario(datosUsuario) {
+  // Objeto para almacenar el resultado de la operación.
+  let resultado = {};
+
+  // Verifica que los datos de usuario sean válidos.
+  if (datosUsuario && Object.keys(datosUsuario).length > 0) {
+    // Busca si el usuario ya existe en la base de datos.
+let usuarioExistente = await modeloUsuarios.buscarUsuario({ usuario: datosUsuario.usuario });
+
+// Si el usuario ya existe, devuelve un mensaje de error.
+if (usuarioExistente) {
+  resultado.mensaje = "El usuario ya existe";
+  resultado.datos = datosUsuario;
+  return resultado;
+}
+
+    // Verifica que los datos de usuario incluyan usuario y clave.
+    if (datosUsuario.usuario && datosUsuario.clave) {
+      // Encripta la clave del usuario antes de almacenarla en la base de datos.
+      let claveEncriptada = bcrypt.hashSync(datosUsuario.clave, parseInt(process.env.ENC_SALTROUNDS));
+      datosUsuario.clave = claveEncriptada;
+
+      // Crea el nuevo usuario en la base de datos a través del modelo de usuarios.
+      let resultadoCrear = await modeloUsuarios.crearUno(datosUsuario);
+
+      // Verifica si el usuario se creó correctamente.
+      if (resultadoCrear && resultadoCrear.acknowledged) {
+        resultado.mensaje = "Usuario creado correctamente";
+        resultado.datos = resultadoCrear;
+      } else {
+        resultado.mensaje = "Usuario no creado";
+        resultado.datos = datosUsuario;
+      }
+    } else {
+      resultado.mensaje = "Usuario y clave son obligatorios";
+      resultado.datos = datosUsuario;
     }
-     else {
-           resultado.mensaje = "No hay datos";
-           resultado.datos = datosUsuario;
-    }
-    return resultado;
-};
+  } else {
+    resultado.mensaje = "No hay datos de usuario para crear";
+    resultado.datos = datosUsuario;
+  }
+
+  // Devuelve el resultado de la operación.
+  return resultado;
+}
 
 async function actualizarUsuario(id, datos){
     let resultado = {};
