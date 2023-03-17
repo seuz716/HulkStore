@@ -1,0 +1,39 @@
+{
+  "name": "energia-app",
+  "version": "1.0.0",
+  "description": "Api consulta generacion energetica",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "author": "César Andrés Abadía Dávila",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seuz716/Energia.git"
+  },
+  "keywords": [
+    "Energía"
+  ],
+  "bugs": {
+    "url": "https://github.com/seuz716/Energia/issues"
+  },
+  "homepage": "https://github.com/seuz716/Energia#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.20.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "helmet": "^5.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.7.0",
+    "morgan": "^1.10.0",
+    "ncrypt": "^1.0.7",
+    "nodemon": "^2.0.18",
+    "swagger-jsdoc": "^6.2.1",
+    "swagger-ui-express": "^4.4.0"
+  }
+}
