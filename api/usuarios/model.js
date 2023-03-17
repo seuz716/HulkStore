@@ -32,57 +32,106 @@ async function findAll() {
 
 
 
+// Función que busca y devuelve un documento de usuario por ID utilizando la función `findOne` de la biblioteca `mongodb`
 function obtenerUna(id) {
-            let db =  basedatos.obtenerConexion();
-             return db.collection("users").findOne({"_id" : objectId(id)})
-            .then(function (usuario){
-                return usuario;
-            })
-            .catch(function (error){
-                console.log(error);
-            })
-    };  
 
-async function buscarUsuario(nombre) {
-        let db =  basedatos.obtenerConexion();
-         return await db.collection("users").findOne({"usuario" : nombre});
-};    
+    // Obtener una conexión a la base de datos
+    let db = basedatos.obtenerConexion();
 
+    // Buscar el documento utilizando `findOne` y devolver la promesa resultante
+    return db.collection("users").findOne({"_id" : objectId(id)})
 
-async function crearUno(datosUsuario){
-    let db =  basedatos.obtenerConexion();
-     return  await db.collection("users").insertOne(datosUsuario);
+        // Si la promesa se resuelve correctamente, devolver el documento de usuario
+        .then(function (usuario){
+            return usuario;
+        })
+
+        // Si se produce un error, imprimirlo en la consola y continuar
+        .catch(function (error){
+            console.log(error);
+        })
+
 };
+
+
+// Función asincrónica que busca un documento de usuario en una base de datos
+// utilizando la función `findOne` de la biblioteca `mongodb`
+async function buscarUsuario(datosUsuario) {
+
+    // Obtener una conexión a la base de datos
+    let db = basedatos.obtenerConexion();
+
+    // Esperar la resolución de la promesa devuelta por `findOne` utilizando la palabra clave `await`
+    return await db.collection("users").findOne({usuario: datosUsuario.usuario});
+
+};
+   
+
+
+// Función asincrónica que crea un nuevo documento de usuario en una base de datos
+// utilizando la función `insertOne` de la biblioteca `mongodb`
+async function crearUno(datosUsuario){
+
+    // Obtener una conexión a la base de datos
+    let db =  basedatos.obtenerConexion();
+
+    // Esperar la resolución de la promesa devuelta por `insertOne` utilizando la palabra clave `await`
+    return await db.collection("users").insertOne(datosUsuario)
+    
+    // Manejar el resultado de la operación de inserción
+    .then(function (resultado){
+        console.log(resultado);
+        return resultado; 
+    })
+
+    // Manejar los errores que puedan ocurrir durante la operación de inserción
+    .catch(function (error){
+        console.log(error);
+    });
+};
+
+
 
 function actualizarUna(id, datos){
+    // Obtener la conexión a la base de datos
     let db =  basedatos.obtenerConexion();
-     return db.collection("users").updateOne(
-            {"_id": objectId(id)},
-            {"$set": datos}
-     )       
+
+    // Actualizar un documento de la colección 'users' según su ID, estableciendo nuevos valores para los campos especificados en 'datos'
+    return db.collection("users").updateOne(
+        {"_id": objectId(id)}, // Consulta para encontrar el documento a actualizar, basándose en su ID
+        {"$set": datos} // Operador de actualización para establecer nuevos valores para los campos especificados en 'datos'
+    )
+    // Si la actualización es exitosa, devolver un objeto con información sobre la operación
     .then(function (resultado){
-        console.log(resultado);
-        return resultado; 
+        console.log(resultado); // Imprimir información sobre la operación en la consola
+        return resultado; // Devolver el objeto con información sobre la operación
     })
+    // Si ocurre algún error durante la actualización, imprimir el error en la consola
     .catch(function (error){
         console.log(error);
-    })
+    });
 };
 
+
 function eliminarUna(id){
+    // Obtener la conexión a la base de datos
     let db =  basedatos.obtenerConexion();
-     return db.collection("users").deleteOne(
-            {"_id": objectId(id)},
-           
-     )       
+
+    // Eliminar un documento de la colección 'users' según su ID
+    return db.collection("users").deleteOne(
+        {"_id": objectId(id)}
+    )
+    // Si la eliminación es exitosa, devolver un objeto con información sobre la operación
     .then(function (resultado){
-        console.log(resultado);
-        return resultado; 
+        console.log(resultado); // Imprimir información sobre la operación en la consola
+        return resultado; // Devolver el objeto con información sobre la operación
     })
+    // Si ocurre algún error durante la eliminación, imprimir el error en la consola
     .catch(function (error){
         console.log(error);
-    })
+    });
 };
+
 
 
 

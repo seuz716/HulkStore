@@ -2,39 +2,54 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const modeloUsuarios = require('./model');
 const jwt = require('../auth/jwt');
-require('dotenv').config();
 
 
-async function iniciarSesion(datosUsuario){
-    let resultado ={};
-    if (datosUsuario && Object.keys(datosUsuario).length>0 && datosUsuario.usuario && datosUsuario.clave){
-            let usuario = await modeloUsuarios.buscarUsuario(datosUsuario.usuario);
-            if (usuario){
-                let claveEncriptada = usuario.clave;
-                let esValida = bcrypt.compareSync(datosUsuario.clave, claveEncriptada);
-                if (esValida){
-                    resultado.mensaje = "Inicio de sesión correcto";
-                    let token = jwt.generarToken(usuario);
-                    delete usuario.clave;
-                    resultado.token = token;
-                     
-                } 
-                else {
-                    resultado.mensaje = "Usuario o Clave incorrectos";
-                    resultado.datos = datosUsuario;
-                }
-            } 
-            else {
-                    resultado.mensaje = "Usuario o Clave incorrectos";
-                    resultado.datos = datosUsuario;
-            }
-    } 
-    else {
-             resultado.mensaje = "Datos Incorecctos";
-             resultado.datos = datosUsuario; 
+
+// Inicia sesión de usuario
+async function iniciarSesion(datosUsuario) {
+  let resultado = {};
+  
+  // Verifica que los datos de usuario sean válidos
+  if (
+    datosUsuario &&
+    Object.keys(datosUsuario).length > 0 &&
+    datosUsuario.usuario &&
+    datosUsuario.clave
+  ) {
+    // Busca el usuario por su nombre de usuario
+    let usuario = await modeloUsuarios.buscarUsuario({ usuario: datosUsuario.usuario });
+    
+    if (usuario) {
+      // Verifica si la clave de usuario es válida
+      let claveEncriptada = usuario.clave;
+      let esValida = bcrypt.compareSync(datosUsuario.clave, claveEncriptada);
+      
+      if (esValida) {
+        // Genera un token JWT para el usuario y lo agrega al resultado
+        resultado.mensaje = "Inicio de sesión correcto";
+        let token = jwt.generarToken(usuario);
+        delete usuario.clave;
+        resultado.token = token;
+      } else {
+        // Devuelve un mensaje de error si la clave es incorrecta
+        resultado.mensaje = "Usuario o Clave incorrectos";
+        resultado.datos = datosUsuario;
+      }
+    } else {
+      // Devuelve un mensaje de error si el usuario no existe
+      resultado.mensaje = "Usuario o Clave incorrectos";
+      resultado.datos = datosUsuario;
     }
-    return resultado;
+  } else {
+    // Devuelve un mensaje de error si los datos son inválidos
+    resultado.mensaje = "Datos Incorrectos";
+    resultado.datos = datosUsuario;
+  }
+
+  // Retorna el resultado de la operación
+  return resultado;
 }
+
 
 async function obtenerUsuarios(){
     let resultado = await modeloUsuarios.findAll();
@@ -49,32 +64,22 @@ async function obtenerUsuarios(){
  * @param {string} datosUsuario.clave - La contraseña en texto plano del nuevo usuario.
  * @returns {Object} Un objeto que indica si el usuario se creó correctamente o no.
  */
+
 async function crearUsuario(datosUsuario) {
-  // Objeto para almacenar el resultado de la operación.
   let resultado = {};
 
-  // Verifica que los datos de usuario sean válidos.
   if (datosUsuario && Object.keys(datosUsuario).length > 0) {
-    // Busca si el usuario ya existe en la base de datos.
-let usuarioExistente = await modeloUsuarios.buscarUsuario({ usuario: datosUsuario.usuario });
+    let usuarioExistente = await modeloUsuarios.buscarUsuario({ usuario: datosUsuario.usuario });
 
-// Si el usuario ya existe, devuelve un mensaje de error.
-if (usuarioExistente) {
-  resultado.mensaje = "El usuario ya existe";
-  resultado.datos = datosUsuario;
-  return resultado;
-}
-
-    // Verifica que los datos de usuario incluyan usuario y clave.
-    if (datosUsuario.usuario && datosUsuario.clave) {
-      // Encripta la clave del usuario antes de almacenarla en la base de datos.
-      let claveEncriptada = bcrypt.hashSync(datosUsuario.clave, parseInt(process.env.ENC_SALTROUNDS));
+    if (usuarioExistente) {
+      resultado.mensaje = "El usuario ya existe";
+      resultado.datos = datosUsuario;
+      return resultado;
+    } else if (datosUsuario.usuario && datosUsuario.clave) {
+      let claveEncriptada = bcrypt.hashSync(datosUsuario.clave, 10);
       datosUsuario.clave = claveEncriptada;
-
-      // Crea el nuevo usuario en la base de datos a través del modelo de usuarios.
       let resultadoCrear = await modeloUsuarios.crearUno(datosUsuario);
 
-      // Verifica si el usuario se creó correctamente.
       if (resultadoCrear && resultadoCrear.acknowledged) {
         resultado.mensaje = "Usuario creado correctamente";
         resultado.datos = resultadoCrear;
@@ -91,61 +96,73 @@ if (usuarioExistente) {
     resultado.datos = datosUsuario;
   }
 
-  // Devuelve el resultado de la operación.
   return resultado;
 }
 
+// Esta función asincrónica actualiza un usuario en la base de datos
+// tomando un ID de usuario y los datos actualizados como argumentos
 async function actualizarUsuario(id, datos){
-    let resultado = {};
-    if (id && id.length == 24){
-        if (datos && Object.keys(datos).length > 0){
-            if (datos.nombre && datos.nombre !== ""){
-                let resConsulta = await modeloUsuarios.actualizarUna(id, datos); 
-                    if (resConsulta && resConsulta.acknowledged){
-                        resultado.mensaje = "Usuario Actualizado correctamente";
-                        resultado.datos = resConsulta;
-                    } 
-                    else {
-                          resultado.mensaje = "Error al actualizar";
-                          resultado.datos = resConsulta;  
-                    }               
-            } 
-            else {
-                resultado.mensaje = "Titulo vacio";
-                resultado.datos = datos.nombre ? datos.nombre :"" ;
-            }
-        } 
-        else {
-                resultado.mensaje = "No hay datos";
-                resultado.datos = datos;
-        }
-   } 
-    else {
-        resultado.mensaje = "ID invalido";
-        resultado.datos = id;
+    // Validar que el ID del usuario sea válido
+    if (!id || id.length !== 24) {
+        throw new Error("ID inválido");
     }
-    return resultado;
+
+    // Validar que se hayan proporcionado datos para actualizar
+    if (!datos || Object.keys(datos).length === 0) {
+        throw new Error("No hay datos para actualizar");
+    }
+
+    // Validar que el campo de nombre sea válido
+    if (!datos.usuario || typeof datos.usuario !== "string" || datos.usuario.trim() === "") {
+        throw new Error(" Usuario inválido");
+    }
+
+    // Actualizar el usuario en la base de datos
+    const resConsulta = await modeloUsuarios.actualizarUna(id, datos); 
+
+    // Validar que se haya actualizado correctamente
+    if (!resConsulta.acknowledged) {
+        throw new Error("Error al actualizar");
+    }
+
+    // Devolver un mensaje de éxito
+    return "Usuario actualizado correctamente";
 };
 
-async function eliminarUsuario(id){
-    let resultado = {};
-    if (id && id.length == 24 && /^[0-9A-F]+$/i.test(id)){
-        let resultadoEliminar = await modeloUsuarios.eliminarUna(id); 
-                if        (resultadoEliminar  && resultadoEliminar.acknowledged){
-                          resultado.mensaje = "Usuario eliminado correctamente";
-                          resultado.datos = resultadoEliminar;
-                    } 
-                else {
-                          resultado.mensaje = "Error al eliminar";
-                          resultado.datos = id;  
-                    }               
-             } 
-                else {
-                          resultado.mensaje = "ID invalido";
-                          resultado.datos = id;
-                     }
-     return resultado;
-};
+async function eliminarUsuario(id) {
+    try {
+        // Validar la longitud y el formato del ID
+        if (!id || id.length !== 24 || !/^[0-9A-F]+$/i.test(id)) {
+            throw new Error("ID inválido");
+        }
+
+        // Verificar que el usuario exista en la base de datos
+        const usuario = await modeloUsuarios.obtenerUna(id);
+        if (!usuario) {
+            throw new Error("Usuario no encontrado");
+        }
+
+        // Eliminar el usuario de la base de datos
+        const resultadoEliminar = await modeloUsuarios.eliminarUna(id);
+
+        // Verificar si se eliminó el usuario correctamente
+        const eliminado = resultadoEliminar && resultadoEliminar.acknowledged;
+        const mensaje = eliminado ? "Usuario eliminado correctamente" : "Error al eliminar";
+        const codigoEstado = eliminado ? 200 : 500;
+
+        return {
+            mensaje,
+            datos: eliminado ? resultadoEliminar : id,
+            codigoEstado
+        };
+    } catch (error) {
+        return {
+            mensaje: error.message,
+            datos: id,
+            codigoEstado: 400
+        };
+    }
+}
 
 
 

@@ -3,9 +3,9 @@
     "api/usuarios/service.js": [
       {
         "id": "2ed4809a-b3ed-4cc6-94b4-f20476af92c6",
-        "line": 142,
-        "version": 11,
-        "index": 5329
+        "line": 132,
+        "version": 133,
+        "index": 4312
       }
     ]
   }

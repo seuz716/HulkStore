@@ -8,7 +8,7 @@ Recibe datos de usuario por medio de query params.
 Devuelve resultado de autenticación.
 */
 controladorUsuarios.get("/iniciarSesion", async function (req,res) {
-  let datosUsuario = req.query;
+  let datosUsuario = req.body;
   let resultado = await servicioUsuarios.iniciarSesion(datosUsuario);
   res.send(resultado);
 });
@@ -36,10 +36,10 @@ Endpoint para actualizar un usuario existente.
 Recibe el id del usuario a actualizar por medio de params y los nuevos datos por medio de body.
 Devuelve el resultado de la operación.
 */
-controladorUsuarios.put("/actualzarUsuario/:id", async function (req, res) {
+controladorUsuarios.put("/actualizarUsuario/:id", async function (req, res) {
   let id = req.params.id;
   let datos = req.body;
-  let resultado = await servicioUsuarios.actualizarUser(id, datos);
+  let resultado = await servicioUsuarios.actualizarUsuario (id, datos);
   res.send(resultado);
 });
 
