@@ -43,7 +43,7 @@ async function crearProducto(datos) {
   return resultado;
 };
 
-async function actualizarProducto(id, datos) {
+async function actualizarProducto(id, datos, fechaInicio, fechaFin) {
   let resultado = {};
   if (id && id.length == 24) {
     if (datos && Object.keys(datos).length > 0) {
@@ -52,6 +52,14 @@ async function actualizarProducto(id, datos) {
         if (resConsulta && resConsulta.acknowledged) {
           resultado.mensaje = "Producto Actualizada correctamente";
           resultado.datos = resConsulta;
+          // Validación de las fechas
+          if (fechaInicio && fechaFin && fechaInicio < fechaFin) {
+            // Aquí se llama a la función findMovementsByDateRange con las fechas validadas
+            let movimientos = await modelMovimientos.findMovementsByDateRange(id, fechaInicio, fechaFin);
+            resultado.movimientos = movimientos;
+          } else {
+            resultado.mensaje = "Fechas no válidas";
+          }
         } else {
           resultado.mensaje = "Error al actualizar";
           resultado.datos = resConsulta;
@@ -69,7 +77,8 @@ async function actualizarProducto(id, datos) {
     resultado.datos = id;
   }
   return resultado;
-};
+}
+
 
 async function eliminarProducto(id) {
   let resultado = {};
