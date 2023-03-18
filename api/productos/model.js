@@ -1,9 +1,6 @@
 const basedatos = require("../../database/connection");
 const objectId = require("mongodb").ObjectId;
 
-/* Se accede a la bd ,luego a la colleccion, se ejecuta la solicitud en  Json
- de acuerdo a los parametros de busqueda del motor de bd para este caso MongoDb*/
-
 function findAll() {
   const db = basedatos.obtenerConexion();
   return db
@@ -31,7 +28,6 @@ function findOne(id) {
     });
 }
 
-
 function obtenerPorNombre(nombre) {
   let db = basedatos.obtenerConexion();
   return db
@@ -39,15 +35,12 @@ function obtenerPorNombre(nombre) {
     .find({ nombre: new RegExp(nombre, "i") })
     .toArray()
     .then(function (producto) {
-      console.log("Resultados de la búsqueda: ", producto);
       return producto;
     })
     .catch(function (error) {
       console.log(error);
     });
 }
-
-
 
 function crearUno(datos) {
   let db = basedatos.obtenerConexion();
@@ -90,9 +83,30 @@ function eliminarUna(id) {
     });
 }
 
+function actualizarInventario(id, movimiento) {
+  const db = basedatos.obtenerConexion();
+  return db
+    .collection("productos")
+    .updateOne(
+      { _id: objectId(id) },
+      {
+        $inc: { "inventario.stock": movimiento.cantidad },
+        $push: { "inventario.movimientos": movimiento },
+      }
+    )
+    .then(function (resultado) {
+      console.log(resultado);
+      return resultado;
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+}
+
 module.exports.findAll = findAll;
 module.exports.findOne = findOne;
 module.exports.obtenerPorNombre = obtenerPorNombre;
 module.exports.crearUno = crearUno;
 module.exports.actualizarUna = actualizarUna;
 module.exports.eliminarUna = eliminarUna;
+module.exports.actualizarInventario = actualizarInventario;
