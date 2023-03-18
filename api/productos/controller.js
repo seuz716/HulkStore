@@ -18,7 +18,6 @@ controladorProductos.get("/obtenerProductos", async function (req, res) {
   });
 });
 
-
 // GET -> Obtiene una Producto por Id.
 controladorProductos.get("/obtenerProducto/:id", async function (req, res) {
   // Se obtiene el ID de la Producto de los parámetros de la URL
@@ -27,7 +26,7 @@ controladorProductos.get("/obtenerProducto/:id", async function (req, res) {
   let Producto = await serviceProductos.obtenerProducto(id);
   // Se envía la respuesta con la Producto obtenida
   res.send({
-    " mensaje": "Estación Eléctrica",
+    
     data: Producto,
   });
 });
@@ -37,11 +36,11 @@ controladorProductos.get("/obtenerProductoPorNombre/:nombre", async function (re
   // Se obtiene el nombre de la Producto de los parámetros de la URL
   let nombre = req.params.nombre;
   // Se llama a la función obtenerProductoPorNombre del servicio, pasándole el nombre
-  let Producto = await serviceProductos.obtenerProductoPorNombre(nombre);
+  let producto = await serviceProductos.obtenerProductoPorNombre(nombre);
   // Se envía la respuesta con la Producto obtenida
   res.send({
-    "mensaje ": "Plantas Encontrada",
-    data: Producto
+    
+    data: producto
   });
 });
 
@@ -58,20 +57,17 @@ controladorProductos.post("/crearProducto", async function (req, res) {
   });
 });
 
+// PUT -> Actualiza una Producto existente.
 controladorProductos.put("/actualizarProducto/:id", async function (req, res) {
   // Se obtiene el ID de la Producto de los parámetros de la URL
   let id = req.params.id;
   // Se obtienen los datos actualizados de la Producto del cuerpo de la petición
   let datos = req.body;
-  // Se obtienen las fechas de inicio y fin de la petición
-  let fechaInicio = req.body.fechaInicio;
-  let fechaFin = req.body.fechaFin;
-  // Se llama a la función actualizarProducto del servicio, pasándole el ID, los datos actualizados y las fechas
-  let resultado = await serviceProductos.actualizarProducto(id, datos, fechaInicio, fechaFin);
+  // Se llama a la función actualizarProducto del servicio, pasándole el ID y los datos actualizados
+  let resultado = await serviceProductos.actualizarProducto(id, datos);
   // Se envía la respuesta con el resultado de la operación de actualización
   res.send(resultado);
 });
-
 
 // DELETE -> Elimina una Producto existente.
 controladorProductos.delete("/eliminarProducto/:id", async function (req, res) {

@@ -7,11 +7,11 @@ const objectId = require("mongodb").ObjectId;
 function findAll() {
   const db = basedatos.obtenerConexion();
   return db
-    .collection("generacionElectrica")
+    .collection("productos")
     .find({})
     .toArray()
-    .then(function (centrales) {
-      return centrales;
+    .then(function (productos) {
+      return productos;
     })
     .catch(function (error) {
       console.log(error);
@@ -21,10 +21,10 @@ function findAll() {
 function findOne(id) {
   const db = basedatos.obtenerConexion();
   return db
-    .collection("generacionElectrica")
+    .collection("productos")
     .findOne({ _id: objectId(id) })
-    .then(function (central) {
-      return central;
+    .then(function (producto) {
+      return producto;
     })
     .catch(function (error) {
       console.log(error);
@@ -35,11 +35,12 @@ function findOne(id) {
 function obtenerPorNombre(nombre) {
   let db = basedatos.obtenerConexion();
   return db
-    .collection("generacionElectrica")
-    .find({ name: new RegExp(nombre, "i") })
+    .collection("productos")
+    .find({ nombre: new RegExp(nombre, "i") })
     .toArray()
-    .then(function (central) {
-      return central;
+    .then(function (producto) {
+      console.log("Resultados de la búsqueda: ", producto);
+      return producto;
     })
     .catch(function (error) {
       console.log(error);
@@ -47,10 +48,11 @@ function obtenerPorNombre(nombre) {
 }
 
 
+
 function crearUno(datos) {
   let db = basedatos.obtenerConexion();
   return db
-    .collection("generacionElectrica")
+    .collection("productos")
     .insertOne(datos)
     .then(function (resConsulta) {
       return resConsulta;
@@ -63,7 +65,7 @@ function crearUno(datos) {
 function actualizarUna(id, datos) {
   let db = basedatos.obtenerConexion();
   return db
-    .collection("generacionElectrica")
+    .collection("productos")
     .updateOne({ _id: objectId(id) }, { $set: datos })
     .then(function (resultado) {
       console.log(resultado);
@@ -77,7 +79,7 @@ function actualizarUna(id, datos) {
 function eliminarUna(id) {
   let db = basedatos.obtenerConexion();
   return db
-    .collection("generacionElectrica")
+    .collection("productos")
     .deleteOne({ _id: objectId(id) })
     .then(function (resultado) {
       console.log(resultado);
